@@ -21,7 +21,6 @@ jobs:
         with:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Fetches all history to allow for rebasing
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -37,16 +36,17 @@ jobs:
           git config user.name "GitStreak AI"
           git config user.email "actions@github.com"
           
-          # Force a change to ensure the streak stays active
-          echo "Last run: $(date)" > heartbeat.txt
+          # 1. Force a change in case update.js didn't modify anything
+          # This ensures your "streak" always has a commit to push
+          date > last_run.txt
           
           git add .
           
-          # Only commit if there are changes; '|| exit 0' prevents failure if clean
-          git commit -m "chore: automated repository maintenance" || exit 0
+          # 2. Commit only if there's something to save
+          git commit -m "chore: automated repository maintenance" || echo "No changes to commit"
           
-          # Pull remote changes first to fix the [rejected] error
+          # 3. Pull with rebase to fix the (fetch first) error
           git pull --rebase origin main
           
-          # Final push
+          # 4. Push the final result
           git push origin main
