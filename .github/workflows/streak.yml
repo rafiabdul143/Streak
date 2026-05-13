@@ -18,8 +18,7 @@ jobs:
         with:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Fetch all history so git knows how to merge
-          fetch-depth: 0
+          fetch-depth: 0 # Fetches all history to allow for merging/rebasing
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,16 +35,16 @@ jobs:
           
           git add .
           
-          # Only proceed if there are actual changes
+          # Check if there are changes to avoid the "nothing to commit" error
           if git diff --quiet && git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "No changes detected. Skipping push."
             exit 0
           fi
 
           git commit -m "chore: automated repository maintenance"
           
-          # Pull with rebase to handle the "fetch first" error
+          # Pull latest changes from remote to fix the (fetch first) error
           git pull --rebase origin main
           
-          # Finally, push the merged changes
+          # Push the combined changes back to main
           git push origin main
