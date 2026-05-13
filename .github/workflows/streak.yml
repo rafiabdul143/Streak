@@ -18,7 +18,7 @@ jobs:
         with:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0 # Fetches all history to allow for merging/rebasing
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,18 +33,17 @@ jobs:
           git config user.name "GitStreak AI"
           git config user.email "actions@github.com"
           
+          # 1. Force a change in case update.js didn't modify anything
+          # This ensures your "streak" always has a commit to push
+          date > last_run.txt
+          
           git add .
           
-          # Check if there are changes to avoid the "nothing to commit" error
-          if git diff --quiet && git diff --staged --quiet; then
-            echo "No changes detected. Skipping push."
-            exit 0
-          fi
-
-          git commit -m "chore: automated repository maintenance"
+          # 2. Commit only if there's something to save
+          git commit -m "chore: automated repository maintenance" || echo "No changes to commit"
           
-          # Pull latest changes from remote to fix the (fetch first) error
+          # 3. Pull with rebase to fix the (fetch first) error
           git pull --rebase origin main
           
-          # Push the combined changes back to main
+          # 4. Push the final result
           git push origin main
