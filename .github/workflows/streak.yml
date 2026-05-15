@@ -33,8 +33,8 @@ jobs:
 
       - name: Commit and Push Changes
         run: |
-          git config user.name "GitStreak AI"
-          git config user.email "actions@github.com"
+          git config user.name "M.A Rafi"
+          git config user.email "mohdabdulrafi17@gmail.com"
           
           # 1. Force a change in case update.js didn't modify anything
           # This ensures your "streak" always has a commit to push
